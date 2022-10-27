@@ -12,17 +12,6 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-
- final int _currentIndex = 1;
-  final List<Widget> _pages=[];
-  @override
-  void initState() {
-    _pages.add(const MainPage(title: '',));
-    // _pages.add(CatalogPage());
-    // _pages.add(SettingScreen());
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,6 +19,7 @@ class _MainPageState extends State<MainPage> {
       body: Container(
         decoration: const BoxDecoration(color: Colors.white),
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
@@ -52,6 +42,10 @@ class _MainPageState extends State<MainPage> {
               ),
 
               DiscountProductsContainer(),
+
+              SizedBox(
+                height: 50,
+              )
             ],
           ),
         ),
