@@ -1,7 +1,11 @@
+import 'package:bozorbek_login/screen/register_bloc/register_cubit.dart';
+import 'package:bozorbek_login/screen/register_f_page.dart';
+import 'package:bozorbek_login/screen/register_page.dart';
+import 'package:bozorbek_login/service/register_service.dart';
+import 'package:bozorbek_login/service/verify_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bozorbek_login/core/constants/color_const.dart';
 import 'package:bozorbek_login/core/constants/string_const.dart';
-import 'package:bozorbek_login/screen/register_f_page.dart';
-import 'package:bozorbek_login/service/register_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,12 +16,22 @@ class RegisterContainer extends StatefulWidget {
   final String register;
   const RegisterContainer(
       {super.key, required this.image, required this.register});
-
   @override
   State<RegisterContainer> createState() => _RegisterContainerState();
 }
 
 class _RegisterContainerState extends State<RegisterContainer> {
+  var smsContrl = TextEditingController();
+  var name_contrl = TextEditingController();
+  var phonNum;
+  var phone_numController = TextEditingController();
+  bool isWrongCode = false;
+  bool didCodeSent = false;
+  var maskFormatter = MaskTextInputFormatter(
+      mask: '## ### ## ##',
+      filter: {"#": RegExp(r'[0-9]')},
+      type: MaskAutoCompletionType.lazy);
+
   SnackBar _showScaffold(String message, {Color? color}) {
     return SnackBar(
       duration: const Duration(seconds: 1),
@@ -29,14 +43,6 @@ class _RegisterContainerState extends State<RegisterContainer> {
       ),
     );
   }
-
-  var phone_numController = TextEditingController();
-  bool isWrongCode = false;
-  bool didCodeSent = false;
-  var maskFormatter = MaskTextInputFormatter(
-      mask: '## ### ## ##',
-      filter: {"#": RegExp(r'[0-9]')},
-      type: MaskAutoCompletionType.lazy);
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +90,7 @@ class _RegisterContainerState extends State<RegisterContainer> {
             height: 60.sp,
             child: TextField(
               textInputAction: TextInputAction.next,
-              //  controller: login_contrl,
-
+              controller: name_contrl,
               decoration: InputDecoration(
                 // hintText: '+998 _ _  _ _ _  _ _  _ _',
                 labelText: StringConst.name_suren,
@@ -149,6 +154,7 @@ class _RegisterContainerState extends State<RegisterContainer> {
               child: Stack(children: [
                 //Text Field 3
                 TextField(
+                  controller: smsContrl,
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(4),
                   ],
@@ -229,32 +235,42 @@ class _RegisterContainerState extends State<RegisterContainer> {
                 //       Password();
                 //     });
 
-                var data = RegisterService.post(
-                    '+998${maskFormatter.getUnmaskedText()}');
-
-                var sms = data.toString().split(" ")[0];
-                print(sms);
-                bool sms2 = data.toString().split(" ")[0] == "{phone_num";
-                print(sms2);
-                if (data.toString().split(" ")[0] == "{phone_num") {
-                  // ignore: use_build_context_synchronously
-                  _showScaffold("Yaxshi Natija");
-                } else {
-                  // ignore: use_build_context_synchronously
-
-                  _showScaffold("Oxhamadi Brat", color: ColorConst.red);
+                phonNum = '+998${maskFormatter.getUnmaskedText()}';
+                if (didCodeSent == false) {
+                  setState(() {
+                    
+                        RegisterPost(context, phonNum);
+                    didCodeSent = true;
+                  });
                 }
 
-                if (didCodeSent) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const RegisterFPage()),
-                  );
+                if (smsContrl.text.isNotEmpty) {
+                 VerifyPost(
+                       phonNum, smsContrl.text, name_contrl.text);
                 }
 
-                didCodeSent = !didCodeSent;
-                setState(() {});
+                // var data = RegisterService.post(
+                //     '+998${maskFormatter.getUnmaskedText()}');
+                // //var dataa = VerifyService.post(phoneNum, smsContrl.text);
+                // var sms = data.toString().split(" ");
+                // print(sms);
+                // bool sms2 = data.toString().split(" ")[0] == "{phone_num:";
+                // print(sms2);
+                // if (data.toString().split(" ")[0] == "{phone_num:") {
+                //   // ignore: use_build_context_synchronously
+                //   _showScaffold("Yaxshi Natija");
+                // } else {
+                //   // ignore: use_build_context_synchronously
+                //   _showScaffold("Oxhamadi Brat", color: ColorConst.red);
+                // }
+                // if (dataa.toString().split(' ')[0]=='{message:') {
+                //   Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => const RegisterFPage()),
+                //   );
+                // }
+                // didCodeSent = true;
               },
               style: ElevatedButton.styleFrom(
                 elevation: 5,
@@ -272,7 +288,45 @@ class _RegisterContainerState extends State<RegisterContainer> {
         ]));
   }
 
-  OutlineInputBorder myfocusborderL() {
+  Future VerifyPost(String phoneNum, String smsCode, String name) async {
+    var data = await VerifyService.post(phoneNum, smsCode);
+
+    if (data.toString().split(" ")[0] == "{message:") {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(_showScaffold(
+          "SMS  SSSS  Yaxshi natija",
+          color: ColorConst.greenish));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => RegisterFPage(
+                    phonNum: phoneNum,
+                    smsCode: smsCode,
+                    name: name,
+                  )));
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+          _showScaffold("SSSSSSSxhamadi Brat", color: ColorConst.red));
+    }
+    setState(() {});
+  }
+
+  Future RegisterPost(BuildContext context, String phoneN) async {
+    var data = await RegisterService.post(phoneN);
+    var d = data.toString().split(" ");
+    if (data.toString().split(" ")[0] == "{phone_num:") {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+          _showScaffold("Yaxshi natija", color: ColorConst.greenish));
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context)
+          .showSnackBar(_showScaffold("Oxhamadi Brat", color: ColorConst.red));
+    }
+    setState(() {});
+  }
+   OutlineInputBorder myfocusborderL() {
     return const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)),
         borderSide: BorderSide.none);

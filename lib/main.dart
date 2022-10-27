@@ -1,5 +1,5 @@
-import 'package:bozorbek_login/screen/cubit/login_cubit.dart';
-import 'package:bozorbek_login/screen/login_page.dart';
+import 'package:bozorbek_login/screen/login_cubit/login_cubit.dart';
+import 'package:bozorbek_login/screen/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +10,6 @@ void main() {
       BlocProvider(
         create: (context) => LoginCubit(),
       ),
-      
     ],
     child: const MyApp(),
   ));
@@ -38,7 +37,7 @@ class MyApp extends StatelessWidget {
           home: child,
         );
       },
-      child: const LoginPage(title: 'Login Page'),
+      child: const MainPage(title: 'Login Page'),
     );
   }
 }

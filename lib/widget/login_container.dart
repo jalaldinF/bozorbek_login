@@ -1,13 +1,11 @@
 import 'package:bozorbek_login/core/constants/color_const.dart';
 import 'package:bozorbek_login/core/constants/string_const.dart';
-import 'package:bozorbek_login/logic/phone_num_form.dart';
-import 'package:bozorbek_login/screen/cubit/login_cubit.dart';
+import 'package:bozorbek_login/screen/login_cubit/login_cubit.dart';
 import 'package:bozorbek_login/screen/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class LoginContainer extends StatefulWidget {
   final String image;
@@ -20,39 +18,22 @@ class LoginContainer extends StatefulWidget {
 }
 
 class _LoginContainerState extends State<LoginContainer> {
-  var maskFormatter = MaskTextInputFormatter(
-      mask: '## ### ## ##',
-      filter: {"#": RegExp(r'[0-9]')},
-      type: MaskAutoCompletionType.lazy);
-  var form = PhoneNumbForm();
-  var login_contrl = TextEditingController(); //login textfield controller
-  final textFieldFocusNode = FocusNode();
-  bool _obscured = true;
-  final password_controller = TextEditingController();
-  bool error = false;
-
-  void _toggleObscured() {
-    setState(() {
-      _obscured = !_obscured;
-      if (textFieldFocusNode.hasPrimaryFocus) {
-        return;
-      } // If focus is on text field, dont unfocus
-      textFieldFocusNode.canRequestFocus =
-          false; // Prevents focus if tap on eye
-    });
-  }
+  @override
+  // TODO: implement context
+  BuildContext get context => super.context;
 
   void notPassword() {
-    error = true;
+    context.watch<LoginCubit>().error = true;
   }
 
   void Password() {
-    error = false;
+    context.watch<LoginCubit>().error = false;
   }
 
   @override
   Widget build(BuildContext context) {
-    var cubit = context.read<LoginCubit>();
+    var readCubit = context.read<LoginCubit>();
+    var watchCubit = context.watch<LoginCubit>();
     return Container(
         decoration: BoxDecoration(
             boxShadow: [
@@ -71,7 +52,7 @@ class _LoginContainerState extends State<LoginContainer> {
           SizedBox(
             height: 73.sp,
           ),
-
+        
           // Circle Picture
           CircleAvatar(
             backgroundColor: ColorConst.greenish,
@@ -88,11 +69,11 @@ class _LoginContainerState extends State<LoginContainer> {
             widget.login,
             style: TextStyle(fontSize: 25.sp),
           ),
-
+        
           SizedBox(height: 40.sp),
-
+        
           //Text Field 1
-
+        
           Container(
             //  color: Colors.red,
             padding: EdgeInsets.only(
@@ -100,9 +81,9 @@ class _LoginContainerState extends State<LoginContainer> {
             height: 75.sp,
             child: TextField(
               textInputAction: TextInputAction.next,
-              controller: login_contrl,
+              controller: watchCubit.login_contrl,
               inputFormatters: [
-                maskFormatter,
+                readCubit.maskFormatter,
                 LengthLimitingTextInputFormatter(12),
               ],
               keyboardType: TextInputType.phone,
@@ -125,9 +106,9 @@ class _LoginContainerState extends State<LoginContainer> {
               ),
             ),
           ),
-
+        
           //Text Field 2
-
+        
           Container(
             //  color: Colors.green,
             //  alignment: Alignment.center,
@@ -139,25 +120,28 @@ class _LoginContainerState extends State<LoginContainer> {
               children: [
                 TextField(
                   textInputAction: TextInputAction.next,
-                  controller: password_controller,
+                  controller: watchCubit.password_controller,
                   keyboardType: TextInputType.visiblePassword,
-                  obscureText: _obscured,
-                  focusNode: textFieldFocusNode,
+                  obscureText: watchCubit.obscured,
+                  focusNode: readCubit.textFieldFocusNode,
                   decoration: InputDecoration(
-                    focusedBorder:
-                        error ? cubit.myfocusborder() : cubit.myfocusborderr(),
-                    enabledBorder:
-                        error ? cubit.myfocusborder() : cubit.myfocusborderr(),
+                    focusedBorder: watchCubit.error
+                        ? readCubit.myfocusborder()
+                        : readCubit.myfocusborderr(),
+                    enabledBorder: watchCubit.error
+                        ? readCubit.myfocusborder()
+                        : readCubit.myfocusborderr(),
                     floatingLabelBehavior: FloatingLabelBehavior
                         .never, //Hides label on focus or if filled
                     labelText: "Пароль",
                     //  prefixText: '+998 ',
                     filled: true, // Needed for adding a fill color
-                    fillColor:
-                        error ? ColorConst.error_red : const Color(0xffEEF3F9),
+                    fillColor: watchCubit.error
+                        ? ColorConst.error_red
+                        : const Color(0xffEEF3F9),
                     isDense: true, // Reduces height a bit
                     border: OutlineInputBorder(
-                      borderSide: error
+                      borderSide: watchCubit.error
                           ? const BorderSide(color: Colors.green, width: 2.0)
                           : BorderSide.none, // No border
                       borderRadius:
@@ -171,9 +155,9 @@ class _LoginContainerState extends State<LoginContainer> {
                     suffixIcon: Padding(
                       padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
                       child: GestureDetector(
-                        onTap: _toggleObscured,
+                        onTap: readCubit.toggleObscured,
                         child: Icon(
-                          _obscured
+                          watchCubit.obscured
                               ? Icons.visibility_off_rounded
                               : Icons.visibility,
                           size: 20,
@@ -186,7 +170,7 @@ class _LoginContainerState extends State<LoginContainer> {
                 Padding(
                   padding: const EdgeInsets.only(right: 75, bottom: 55),
                   child: Text(
-                    error ? 'Не правильный логин или пароль' : '',
+                    watchCubit.error ? 'Не правильный логин или пароль' : '',
                     style: const TextStyle(
                         color: Colors.red,
                         fontWeight: FontWeight.bold,
@@ -199,7 +183,7 @@ class _LoginContainerState extends State<LoginContainer> {
           // SizedBox(
           //   height: 5,
           // ),
-
+        
           Wrap(
             children: [
               const Text(
@@ -223,7 +207,7 @@ class _LoginContainerState extends State<LoginContainer> {
               ),
             ],
           ),
-
+        
           const Text(
             'Забыли пароль?                                           ',
             style: TextStyle(
@@ -237,14 +221,15 @@ class _LoginContainerState extends State<LoginContainer> {
             width: 93.sp,
             child: ElevatedButton(
               onPressed: () async {
-                if (password_controller.text.length < 6 ||
-                    login_contrl.text.length < 12) {
+                if (watchCubit.password_controller.text.length < 6 ||
+                    watchCubit.login_contrl.text.length < 12) {
                   setState(() {
                     notPassword();
                   });
                 } else {
-                  var login = '+998${maskFormatter.getUnmaskedText()}';
-                  var password = password_controller.text;
+                  var login =
+                      '+998${readCubit.maskFormatter.getUnmaskedText()}';
+                  var password = watchCubit.password_controller.text;
                   context.read<LoginCubit>().loginPost(
                       context: context, phoneNumber: login, password: password);
                 }

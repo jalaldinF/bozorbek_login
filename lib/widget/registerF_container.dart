@@ -1,12 +1,21 @@
 import 'package:bozorbek_login/core/constants/color_const.dart';
+import 'package:bozorbek_login/service/setpassword_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RegisterFContainer extends StatefulWidget {
   final String image;
   final String register;
-  const RegisterFContainer(
-      {super.key, required this.image, required this.register});
+  String phonNum;
+  String smsCode;
+  String name;
+  RegisterFContainer(
+      {super.key,
+      required this.image,
+      required this.register,
+      required this.phonNum,
+      required this.name,
+      required this.smsCode});
 
   @override
   State<RegisterFContainer> createState() => _RegisterFContainerState();
@@ -15,35 +24,42 @@ class RegisterFContainer extends StatefulWidget {
 class _RegisterFContainerState extends State<RegisterFContainer> {
   bool isSame = false;
   bool value = false;
-  bool _obscured = true;
-
-  bool _obscured2 = true;
+  bool obscured = true;
+  bool obscured2 = true;
   final textFieldFocusNode = FocusNode();
   final textFieldFocusNode2 = FocusNode();
   final password_controller = TextEditingController();
-
   final password_controller2 = TextEditingController();
 
-  void _toggleObscured() {
-    setState(() {
-      _obscured = !_obscured;
-      if (textFieldFocusNode.hasPrimaryFocus) {
-        return;
-      } // If focus is on text field, dont unfocus
-      textFieldFocusNode.canRequestFocus =
-          false; // Prevents focus if tap on eye
-    });
+  void toggleObscured() {
+    obscured = !obscured;
+    if (textFieldFocusNode.hasPrimaryFocus) {
+      return;
+    } // If focus is on text field, dont unfocus
+    textFieldFocusNode.canRequestFocus = false; // Prevents focus if tap on eye
+
+    setState(() {});
   }
 
-  void _toggleObscured2() {
-    setState(() {
-      _obscured2 = !_obscured2;
-      if (textFieldFocusNode2.hasPrimaryFocus) {
-        return;
-      } // If focus is on text field, dont unfocus
-      textFieldFocusNode2.canRequestFocus =
-          false; // Prevents focus if tap on eye
-    });
+  void toggleObscured2() {
+    obscured2 = !obscured2;
+    if (textFieldFocusNode2.hasPrimaryFocus) {
+      return;
+    } // If focus is on text field, dont unfocus
+    textFieldFocusNode2.canRequestFocus = false; // Prevents focus if tap on eye
+    setState(() {});
+  }
+
+  SnackBar showScaffold(BuildContext context, String message, {Color? color}) {
+    return SnackBar(
+      duration: const Duration(seconds: 1),
+      content: Text(message),
+      backgroundColor: color,
+      action: SnackBarAction(
+        label: '',
+        onPressed: () {},
+      ),
+    );
   }
 
   @override
@@ -110,7 +126,7 @@ class _RegisterFContainerState extends State<RegisterFContainer> {
                   textInputAction: TextInputAction.next,
                   controller: password_controller,
                   keyboardType: TextInputType.visiblePassword,
-                  obscureText: _obscured,
+                  obscureText: obscured,
                   focusNode: textFieldFocusNode,
                   decoration: InputDecoration(
                     focusedBorder: isSame ? myfocusborder() : myfocusborderr(),
@@ -138,9 +154,9 @@ class _RegisterFContainerState extends State<RegisterFContainer> {
                     suffixIcon: Padding(
                       padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
                       child: GestureDetector(
-                        onTap: _toggleObscured,
+                        onTap: toggleObscured,
                         child: Icon(
-                          _obscured
+                          obscured
                               ? Icons.visibility_off_rounded
                               : Icons.visibility,
                           size: 20,
@@ -179,7 +195,7 @@ class _RegisterFContainerState extends State<RegisterFContainer> {
                   textInputAction: TextInputAction.next,
                   controller: password_controller2,
                   keyboardType: TextInputType.visiblePassword,
-                  obscureText: _obscured2,
+                  obscureText: obscured2,
                   focusNode: textFieldFocusNode2,
                   decoration: InputDecoration(
                     focusedBorder: isSame ? myfocusborder() : myfocusborderr(),
@@ -207,9 +223,9 @@ class _RegisterFContainerState extends State<RegisterFContainer> {
                     suffixIcon: Padding(
                       padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
                       child: GestureDetector(
-                        onTap: _toggleObscured2,
+                        onTap: toggleObscured2,
                         child: Icon(
-                          _obscured2
+                          obscured2
                               ? Icons.visibility_off_rounded
                               : Icons.visibility,
                           size: 20,
@@ -259,12 +275,8 @@ class _RegisterFContainerState extends State<RegisterFContainer> {
             width: 199.sp,
             child: ElevatedButton(
               onPressed: () {
-                var num = password_controller.text
-                    .compareTo(password_controller2.text);
-                print(num);
-
-                num == 0 ? isSame = false : isSame = true;
-                setState(() {});
+                VerifyPassword(
+                    context, widget.phonNum, widget.smsCode, widget.name);
               },
               style: ElevatedButton.styleFrom(
                 elevation: 5,
@@ -282,6 +294,21 @@ class _RegisterFContainerState extends State<RegisterFContainer> {
         ]));
   }
 
+  Future SetPasswordPost(BuildContext context, String phonNum, String smsCode,
+      String password, String name) async {
+    var data = await SetPasswordService.post(phonNum, smsCode, password, name);
+    var d = data.toString().split(" ");
+    if (data.toString().split(" ")[0] == "{username:") {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+          showScaffold(context, "Yaxshi natija", color: ColorConst.greenish));
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+          showScaffold(context, "Oxhamadi Brat", color: ColorConst.red));
+    }
+  }
+
   OutlineInputBorder myfocusborder() {
     return OutlineInputBorder(
         borderRadius: const BorderRadius.all(Radius.circular(12)),
@@ -295,5 +322,19 @@ class _RegisterFContainerState extends State<RegisterFContainer> {
     return const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)),
         borderSide: BorderSide.none);
+  }
+
+  VerifyPassword(
+      BuildContext context, String phonNum, String smsCode, String name) {
+    var num = password_controller.text.compareTo(password_controller2.text);
+    print(num);
+
+    num == 0 ? isSame = false : isSame = true;
+
+    if (!isSame) {
+      SetPasswordPost(
+          context, phonNum, smsCode, password_controller.text, name);
+    }
+    setState(() {});
   }
 }

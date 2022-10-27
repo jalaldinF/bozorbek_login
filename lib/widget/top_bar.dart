@@ -1,13 +1,10 @@
 import 'package:bozorbek_login/core/constants/string_const.dart';
-import 'package:bozorbek_login/screen/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../service/login_sevice.dart';
-
 class TopBarContainer extends StatelessWidget {
-  final bool isLogin;
-  const TopBarContainer({super.key, required this.isLogin});
+  final String page;
+  const TopBarContainer({super.key, required this.page});
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +13,17 @@ class TopBarContainer extends StatelessWidget {
       width: 375.w,
       //padding:
       //  EdgeInsets.only(top: 59.h, right: 353.w, bottom: 20.h, left: 15.w),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 3,
+              offset: const Offset(0, 3), // changes position of shadow
+            ),
+          ],
           color: Colors.white,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(20),
               bottomRight: Radius.circular(20))),
       child: Row(
@@ -34,10 +39,9 @@ class TopBarContainer extends StatelessWidget {
                 //       MaterialPageRoute(
                 //           builder: (context) => const RegisterPage()));
                 // }
-                print("object");
-                
+                //print("object");
               },
-              child: Icon(
+              child: const Icon(
                 Icons.arrow_back_ios,
                 size: 20,
               ),
@@ -48,7 +52,9 @@ class TopBarContainer extends StatelessWidget {
               bottom: 15.h,
             ),
             child: Text(
-              isLogin ? StringConst.login : StringConst.register,
+              identivyPage(page),
+
+              //StringConst.login : StringConst.register,
               style: const TextStyle(
                 fontSize: 20,
               ),
@@ -57,5 +63,26 @@ class TopBarContainer extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String identivyPage(String page) {
+    switch (page) {
+      case 'login':
+        return StringConst.login;
+      case 'register':
+        return StringConst.register;
+      case 'registerF':
+        return StringConst.register;
+      case 'mainP':
+        return StringConst.mainPage;
+      case 'catalog':
+        return StringConst.catalog;
+      case 'kProducts':
+        return StringConst.kProducts;
+      case 'kInfo':
+        return StringConst.kInfo;
+      default:
+        return 'unknown Page';
+    }
   }
 }

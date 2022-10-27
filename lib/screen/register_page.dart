@@ -17,27 +17,29 @@ class _RegisterPageState extends State<RegisterPage> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Container(
-          decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('assets/images/rec.png'),
-                  fit: BoxFit.cover)),
-          child: Center(
-            child: Column(
-              children: [
-                // Top bar
-                const TopBarContainer(isLogin: false),
-
-                SizedBox(
-                  height: 19.h,
-                ),
-
-                //Login Container
-                RegisterContainer(
-                    image: 'assets/images/user.png',
-                    register: StringConst.register),
-              ],
+        //resizeToAvoidBottomInset: false,
+        body: SingleChildScrollView(
+          child: Container(
+            decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/images/rec.png'),
+                    fit: BoxFit.cover)),
+            child: Center(
+              child: Column(
+                children: [
+                  // Top bar
+                  const TopBarContainer(page: 'register',),
+              
+                  SizedBox(
+                    height: 19.h,
+                  ),
+              
+                  //Login Container
+                  RegisterContainer(
+                      image: 'assets/images/user.png',
+                      register: StringConst.register),
+                ],
+              ),
             ),
           ),
         ),

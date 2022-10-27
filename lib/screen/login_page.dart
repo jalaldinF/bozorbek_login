@@ -19,27 +19,29 @@ class _LoginPageState extends State<LoginPage> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+       // resizeToAvoidBottomInset: false,
         body: Container(
           decoration: const BoxDecoration(
               image: DecorationImage(
                   image: AssetImage('assets/images/rec.png'),
                   fit: BoxFit.cover)),
-          child: Column(
-            children: [
-              // Top bar
-              const TopBarContainer(
-                isLogin: true,
-              ),
-
-              SizedBox(
-                height: 19.h,
-              ),
-
-              //Login Container
-              LoginContainer(
-                  image: 'assets/images/user.png', login: StringConst.login),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                // Top bar
+                const TopBarContainer(
+                  page: 'login',
+                ),
+                  
+                SizedBox(
+                  height: 19.h,
+                ),
+                  
+                //Login Container
+                LoginContainer(
+                    image: 'assets/images/user.png', login: StringConst.login),
+              ],
+            ),
           ),
         ),
       ),
