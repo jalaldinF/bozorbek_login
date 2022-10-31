@@ -18,36 +18,39 @@ class _MainPageState extends State<MainPage> {
       // resizeToAvoidBottomInset: false,
       body: Container(
         decoration: const BoxDecoration(color: Colors.white),
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              // Top bar
-              TopBarContainer(
-                page: 'mainP',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top bar
+            const TopBarContainer(
+              page: 'mainP',
+            ),
+
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    RowContainer(),
+                    Text(
+                      '    Все продукты',
+                      style: TextStyle(fontSize: 20, color: Color(0xff42445A)),
+                    ),
+                    AllProductsContainer(),
+                    Text(
+                      '    Вкусные скидки',
+                      style: TextStyle(fontSize: 20, color: Color(0xff42445A)),
+                    ),
+                    DiscountProductsContainer(),
+                    SizedBox(
+                      height: 50,
+                    )
+                  ],
+                ),
               ),
-
-              RowContainer(),
-
-              Text(
-                '    Все продукты',
-                style: TextStyle(fontSize: 20, color: Color(0xff42445A)),
-              ),
-
-              AllProductsContainer(),
-              Text(
-                '    Вкусные скидки',
-                style: TextStyle(fontSize: 20, color: Color(0xff42445A)),
-              ),
-
-              DiscountProductsContainer(),
-
-              SizedBox(
-                height: 50,
-              )
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

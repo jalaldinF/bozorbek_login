@@ -1,4 +1,5 @@
 import 'package:bozorbek_login/home_page.dart';
+import 'package:bozorbek_login/screen/category_page.dart';
 import 'package:bozorbek_login/screen/login_cubit/login_cubit.dart';
 import 'package:bozorbek_login/screen/main_page.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
           home: child,
         );
       },
-      child: const HomePage(title: 'Login Page'),
+      child: const HomePage(title: '',),
     );
   }
 }

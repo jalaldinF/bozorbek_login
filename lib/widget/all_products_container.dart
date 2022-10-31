@@ -1,4 +1,6 @@
 import 'package:bozorbek_login/core/models/products_model.dart';
+import 'package:bozorbek_login/screen/category_page.dart';
+import 'package:bozorbek_login/service/all_products_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -43,19 +45,33 @@ class _AllProductsContainerState extends State<AllProductsContainer> {
       padding: EdgeInsets.only(top: 5.h, bottom: 5.h, left: 5.w),
       height: 250.h,
       // color: Colors.red,
-      child: Center(
-        child: ListView.builder(
-          physics: const BouncingScrollPhysics(),
-          scrollDirection: Axis.horizontal,
-          itemCount: products.length + 1,
-          itemBuilder: (BuildContext context, int index) {
-            if (index < products.length) {
-              return allProducts(index);
-            } else {
-              return showAllButton();
-            }
-          },
-        ),
+      child: FutureBuilder(
+        future: AllProductsService().get(),
+        builder: (context, snapshot) {
+          var error = 'containerdagi malumotlar ${snapshot.data.toString()}';
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator.adaptive());
+          } else if (snapshot.hasError) {
+            return const Center(
+              child: Text("Not Data"),
+            );
+          } else {
+            return Center(
+              child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                itemCount: products.length + 1,
+                itemBuilder: (BuildContext context, int index) {
+                  if (index < products.length) {
+                    return allProducts(index, snapshot.data);
+                  } else {
+                    return showAllButton();
+                  }
+                },
+              ),
+            );
+          }
+        },
       ),
     );
   }
@@ -67,7 +83,11 @@ class _AllProductsContainerState extends State<AllProductsContainer> {
       width: 60.w,
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         MaterialButton(
-          onPressed: () {},
+          onPressed: () {
+            MaterialPageRoute(
+                          builder: (context) => const CategoryPage());
+             
+          },
           color: Colors.grey,
           padding: const EdgeInsets.all(5),
           shape: const CircleBorder(),
@@ -88,7 +108,10 @@ class _AllProductsContainerState extends State<AllProductsContainer> {
     );
   }
 
-  Widget allProducts(int index) {
+  Widget allProducts(int index, data) {
+    String co = data[index].backgroundColor;
+    Color color = Color(int.parse(co.replaceAll('#', '0x')));
+    String imag = 'https://api.bozorbek.uz${data[index].image}';
     return SizedBox(
       // color: Colors.blue,
       height: 240.h,
@@ -115,20 +138,20 @@ class _AllProductsContainerState extends State<AllProductsContainer> {
                 height: 10.h,
               ),
               Text(
-                ' ${products[index].name}',
+                ' ${data[index].name}',
                 style: TextStyle(fontSize: 18.sp, color: Colors.white),
               ),
               SizedBox(
                 height: 5.h,
               ),
               Text(
-                '  ${products[index].catalog}',
+                '   ${data[index].category}',
                 style: TextStyle(fontSize: 8.sp, color: Colors.grey),
               ),
               SizedBox(
                 height: 10.h,
               ),
-              Text(' ${products[index].price}',
+              Text(' ${data[index].price} Сум',
                   style: TextStyle(fontSize: 15.sp, color: Colors.black))
             ],
           ),
@@ -138,8 +161,8 @@ class _AllProductsContainerState extends State<AllProductsContainer> {
           left: 38.w,
           height: 100.h,
           width: 100.w,
-          child: Image.asset(
-            products[index].image,
+          child: Image.network(
+            imag,
             height: 100.h,
             width: 100.w,
           ),

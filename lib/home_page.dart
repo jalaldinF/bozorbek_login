@@ -1,3 +1,4 @@
+import 'package:bozorbek_login/screen/category_page.dart';
 import 'package:bozorbek_login/screen/main_page.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,7 @@ class _HomePageState extends State<HomePage> {
   int currentTab = 0;
   List<Widget> screens = [
     const MainPage(title: ''),
+    const CategoryPage(),
   ];
   final PageStorageBucket bucket = PageStorageBucket();
   Widget currentPage = const MainPage(title: '');
@@ -52,23 +54,35 @@ class _HomePageState extends State<HomePage> {
                     width: 15,
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      setState(() {
+                         currentPage = const MainPage(title: 'title');
+                      currentTab = 0;
+                      });
+                     
+                    },
                     child: Container(
-                      // color: Colors.red,
                       padding: const EdgeInsets.only(top: 5),
                       height: 55,
                       width: 55,
                       //  color: Colors.red,
                       child: Column(
-                        children: const [
-                          Icon(
+                        children: [
+                         Icon(
                             Icons.home_outlined,
-                            size: 30,
+                            size: currentTab == 0 ? 29 : 30,
+                            color: currentTab == 0
+                                ? const Color(0xff7024C4)
+                                : Colors.black,
                           ),
-                          Text('Главная',
-                              style: TextStyle(
-                                fontSize: 11,
-                              ))
+                          Text(
+                            'Главная',
+                            style: currentTab == 0
+                                ? const TextStyle(
+                                    fontSize: 10, color: Color(0xff7024C4))
+                                : const TextStyle(
+                                    fontSize: 11, color: Colors.black),
+                          )
                         ],
                       ),
                     ),
@@ -77,21 +91,34 @@ class _HomePageState extends State<HomePage> {
                     width: 20,
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      setState(() {
+                         currentPage = const CategoryPage();
+                      currentTab = 1;
+                      });
+                     
+                    },
                     child: Container(
                       padding: const EdgeInsets.only(top: 5),
                       height: 55,
                       width: 55,
                       //  color: Colors.red,
                       child: Column(
-                        children: const [
+                        children: [
                           Icon(
                             Icons.assignment_outlined,
-                            size: 30,
+                            size: currentTab == 1 ? 29 : 30,
+                            color: currentTab == 1
+                                ? const Color(0xff7024C4)
+                                : Colors.black,
                           ),
                           Text(
                             'Каталог',
-                            style: TextStyle(fontSize: 11),
+                            style: currentTab == 1
+                                ? const TextStyle(
+                                    fontSize: 10, color: Color(0xff7024C4))
+                                : const TextStyle(
+                                    fontSize: 11, color: Colors.black),
                           )
                         ],
                       ),
